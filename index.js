@@ -1,17 +1,19 @@
 const fs = require('fs');
 const path = require('path');
 const math = require('mathjs');
+require('console.table');
 
 // Define location of training set (a CSV file)
 const filePath = path.join(__dirname, '/data/training-set.txt');
 
 // Define cost function
 function costFunction(data) {
-    const {x, y, thetas} = data;
+    const {xScaled:x, y, thetas} = data;
     const trainingExamples = x.size()[0];
-    const vector = math.square(math.subtract(math.multiply(x, thetas), y));
+    const hypothesis = math.multiply(x, thetas);
+    const squareErrorsVector = math.square(math.subtract(hypothesis, y));
     let cost = 0;
-    vector.forEach((value) => cost += value);
+    squareErrorsVector.forEach((value) => cost += value);
     return 1 / (2 * trainingExamples) * cost;
 }
 
@@ -26,7 +28,6 @@ function gradientDescent(data) {
     // Define other useful variables (number of training examples and number of features)
     const trainingExamples = x.size()[0];
     const features = x.size()[1];
-    const featuresArrayKeys = Array.from(Array(features).keys());
     const trainingArrayKeys = Array.from(Array(trainingExamples).keys());
     
     // Define empty array that will be used to store results of cost function
@@ -50,44 +51,34 @@ function gradientDescent(data) {
 
     // Step 2 is iterating through matrix x and replace each value with scaled value (except first column)
     let xScaled = x.map((value, index) => {
-        
         if (index[1] == 0) return 1;
         else return (value - featuresAverage[index[1]]) / featuresRange[index[1]];
     });
-    
-    while (iterations > 0) {
+
+    while (iterations >= 0) {
         
         // Call cost function
-        costFunctionResults.push(costFunction({x, y, thetas}));
+        costFunctionResults.push(costFunction({xScaled, y, thetas}));
 
-        // Update parameters thetas
-        let delta = math.zeros(features, 1);
-        let tick = {};
-        let xRow = {};
-        let scalar = 0;
-        for(let i = 0; i < trainingExamples; i++) {
-            xRow = xScaled.subset(math.index(i, featuresArrayKeys));
-            scalar = math.subtract(math.multiply(xRow, thetas), y.subset(math.index(i, 0)))._data[0][0];
-            tick = math.multiply(scalar, math.transpose(xRow));
-            delta = math.add(delta, tick);
-        }
-
-        delta = math.multiply(1 / trainingExamples, delta);
-        thetas = math.subtract(thetas, math.multiply(alpha, delta));
+        let hypothesis = math.multiply(xScaled, thetas);
+        let errors = math.subtract(hypothesis, y);
+        let newDecrement = math.multiply(math.multiply(alpha * 1 / trainingExamples, math.transpose(errors)), xScaled);
+        thetas = math.subtract(thetas, math.transpose(newDecrement));
 
         // Decrement iterations counter
         iterations --;
     }
     
     // Print cost function results (useful in debugging to see algorithm is converging)
-    console.log(costFunctionResults[0]);
-    console.log(costFunctionResults[1]);
-    console.log(costFunctionResults[2]);
-    console.log(costFunctionResults[costFunctionResults.length - 1]);
-    console.log(costFunctionResults[costFunctionResults.length]);
+    console.log(math.format(costFunctionResults[costFunctionResults.length - 1], {notation: 'exponential'}));
 
     console.log("\nCalculating parameters vector using the grandient descent algorithm:");
     console.log(thetas._data);
+
+    console.log("\nCalculating parameters vector using the normal equation method:");
+    thetas = math.multiply(math.multiply(math.inv(math.multiply(math.transpose(xScaled), xScaled)), math.transpose(xScaled)), y);
+    console.log(thetas._data);
+
 }
 
 // Read data from training set
@@ -125,8 +116,8 @@ fs.readFile(filePath, 'ascii', function(err, data) {
     let thetas = math.zeros(1, x.size()[1]);
 
     // Define learning rate alpha and number of iterations
-    const alpha = 0.01,
-          iterations = 1000;
+    const alpha = 0.3,
+          iterations = 20000;
 
     // Define data object to call gradient descent function
     data = {x, y, thetas, alpha, iterations};
@@ -134,10 +125,5 @@ fs.readFile(filePath, 'ascii', function(err, data) {
     // Call gradient descent function
     gradientDescent(data);
         
-    // Calculate parameters "Thetas" with normal equation method
-    console.log("\nCalculating parameters vector using the normal equation method:");
-    thetas = math.multiply(math.multiply(math.inv(math.multiply(math.transpose(x), x)), math.transpose(x)), y);
-    console.log(thetas._data);
-
 });
 

@@ -9,6 +9,7 @@
   "author": "Enrico Maini",
   "license": "ISC",
   "dependencies": {
+    "console.table": "^0.7.0",
     "mathjs": "^3.7.0"
   }
 }
