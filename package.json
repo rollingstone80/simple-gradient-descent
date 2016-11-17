@@ -1,0 +1,14 @@
+{
+  "name": "house-prices",
+  "version": "1.0.0",
+  "description": "Gradient descent algorithm to calculate house prices function",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "Enrico Maini",
+  "license": "ISC",
+  "dependencies": {
+    "mathjs": "^3.7.0"
+  }
+}
