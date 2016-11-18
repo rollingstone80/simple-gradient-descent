@@ -1,3 +1,4 @@
+// Function used to calculate vector of parameters thetas
 module.exports = function(data) {
 
     return new Promise((resolve, reject) => {
@@ -40,7 +41,7 @@ module.exports = function(data) {
             else return (value - featuresAverage[index[1]]) / featuresRange[index[1]];
         });
 
-        // Run gradient descent
+        // Run gradient descent algorithm
         while (iterations >= 0) {
             
             // Call cost function and store in array
