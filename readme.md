@@ -18,12 +18,12 @@ Start the script
 npm start
 ```
 
-That's it! Takes roughly 10 seconds on my machine with 0.5 learning rate and 10,000 iterations.
+That's it! Takes roughly 0.8 seconds on my machine, with learning rate alpha set at 0.3 and 10,000 iterations.
 
 ## Built With
 
 * Node version 6.7.0
-* [Mathjs](http://mathjs.org/) - Math library
+* [Vectorious](https://github.com/mateogianolio/vectorious) - Linear algebra library
 
 ## Author
 

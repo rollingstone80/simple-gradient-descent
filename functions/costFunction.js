@@ -1,21 +1,24 @@
 // Function used to calculate cost function result from X, y and thetas
 module.exports = function(data) {
 
-    const math = require('mathjs');
+    const v = require('vectorious');
+    const Matrix = v.Matrix;
 
     // Define matrices and number of training examples
-    const {xScaled:x, y, thetas} = data;
-    const trainingExamples = x.size()[0];
+    const {x, y, thetas} = data;
+    const trainingExamples = x.shape[0];
 
     // Calculate hypothesis 
-    const hypothesis = math.multiply(x, thetas);
+    const hypothesis = Matrix.multiply(x, thetas);
 
     // Calculate vector of square errors
-    const squareErrorsVector = math.square(math.subtract(hypothesis, y));
-    
+    let errorsVector = Matrix.subtract(hypothesis, y);
+    errorsVector = errorsVector.map(value => value * value); 
+        
     // Calculate cost function result
-    let cost = 0;
-    squareErrorsVector.forEach((value) => cost += value);
+    let cost = errorsVector.reduce(function(a, b) {
+        return a + b;
+    });
     return 1 / (2 * trainingExamples) * cost;
 
 }
